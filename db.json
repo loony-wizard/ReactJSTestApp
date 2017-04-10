@@ -1,0 +1,70 @@
+{
+  "departments": [
+    {
+      "id": "0",
+      "name": "Marketing"
+    },
+    {
+      "id": "1",
+      "name": "Services"
+    },
+    {
+      "id": "2",
+      "name": "Product Management"
+    },
+    {
+      "id": "3",
+      "name": "Human Resources"
+    }
+  ],
+  "employees": [
+    {
+      "id": "0",
+      "firstName": "George",
+      "lastName": "Rice",
+      "departmentId": "0"
+    },
+    {
+      "id": "1",
+      "firstName": "Earl",
+      "lastName": "Hicks",
+      "departmentId": "0"
+    },
+    {
+      "id": "2",
+      "firstName": "Catherine",
+      "lastName": "Martin",
+      "departmentId": "1"
+    },
+    {
+      "id": "3",
+      "firstName": "Thomas",
+      "lastName": "Chapman",
+      "departmentId": "2"
+    },
+    {
+      "id": "4",
+      "firstName": "Joshua",
+      "lastName": "Stanley",
+      "departmentId": "3"
+    },
+    {
+      "id": "5",
+      "firstName": "Todd",
+      "lastName": "Gomez",
+      "departmentId": "2"
+    },
+    {
+      "id": "6",
+      "firstName": "Roy",
+      "lastName": "Medina",
+      "departmentId": "3"
+    },
+    {
+      "id": "7",
+      "firstName": "Ronald",
+      "lastName": "Lee",
+      "departmentId": "2"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media screen and (max-width: 1200px) {
+  .container {
+    width: 100%;
+  }
+}
+
+.left-menu {
+  padding: 20px 10px;
+}
+
+.departments,
+.employees {
+  margin: 20px 0;
+}
+
+.btn {
+  margin-top: 20px;
+  cursor: pointer;
+}
+
+.department:hover,
+.employee:hover {
+  color: #fff;
+  background: #2E50FF;
+  cursor: pointer;
+}
+
+.content {
+  margin: 20px 0;
+  padding: 0 30px;
+}
+
+.content h2 {
+  margin-bottom: 45px;
+}
+
+.last-name-input-group {
+  margin-top: 20px;
+}
