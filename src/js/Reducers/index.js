@@ -45,31 +45,39 @@ function reducer(state = initialState, action) {
             selectedEmployeeId: action.employeeId
         }
     } else if (action.type === "DEPARTMENT_WAS_EDITED") {
-        // TODO: save to db
-        // this is not working as I want
-        // it creates new fields in db.json instead of rewriting existing
-        // how can I fix it?
-        /*
-        makeAjaxRequest(`departments`, 'POST', JSON.stringify({
-            id: state.selectedDepartmentId,
-            name: action.value
-        })).catch(error => console.log(error));
-        */
-        window.location.href = "/#/";
+        // FIXED: We need to use `PUT` query for updating db.json,
+        // POST is good here for adding new rows in db.json
         const departments = state.departments;
-        departments[state.selectedDepartmentId].name = action.value;
+        const id = state.selectedDepartmentId;
+        departments[id].name = action.value;
+        const departmentJSON = JSON.stringify({
+            id: departments[id].id.toString(),
+            name: departments[id].name
+        }); 
+        makeAjaxRequest(`departments/${id}`, 'PUT', departmentJSON)
+            .catch(error => console.log(error));
+        window.location.href = "/#/";
+        
         return {
             ...state,
             departments
         };
     } else if (action.type === "EMPLOYEE_WAS_EDITED") {
-        // TODO: save to db
-        // the same story as with department
-        window.location.href = "/#/";
         const employees = state.employees;
-        employees[state.selectedEmployeeId].firstName = action.firstName;
-        employees[state.selectedEmployeeId].lastName = action.lastName;
-        employees[state.selectedEmployeeId].departmentId = action.departmentId;
+        const id = state.selectedEmployeeId;
+        employees[id].firstName = action.firstName;
+        employees[id].lastName = action.lastName;
+        employees[id].departmentId = action.departmentId;
+        const departmentJSON = JSON.stringify({
+            id: employees[id].id.toString(),
+            firstName: employees[id].firstName,
+            lastName: employees[id].lastName,
+            departmentId: employees[id].departmentId.toString()
+        }); 
+        makeAjaxRequest(`employees/${id}`, 'PUT', departmentJSON)
+            .catch(error => console.log(error));
+        window.location.href = "/#/";
+        
         return {
             ...state,
             employees

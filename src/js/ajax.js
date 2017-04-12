@@ -4,6 +4,7 @@ function makeAjaxRequest(url, method = "GET", body = "") {
 
 		const xhr = new XMLHttpRequest();
 		xhr.open(method, url, true);
+		xhr.setRequestHeader("Content-Type", "application/json");
 
 		xhr.onload = function() {
 			if (this.status === 200) {
