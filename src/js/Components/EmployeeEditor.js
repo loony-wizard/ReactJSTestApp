@@ -9,7 +9,8 @@ class EmployeeEditor extends React.Component {
 		this.state = {
 			firstNameInputValue: firstName,
 			lastNameInputValue: lastName,
-			departmentId: departmentId
+			departmentId: departmentId,
+			error_message: null
 		};
 	}
 
@@ -17,8 +18,46 @@ class EmployeeEditor extends React.Component {
 		const firstName = this.firstNameInput.value;
 		const lastName = this.lastNameInput.value;
 		const departmentId = this.state.departmentId;
-		this.props.onEmployeeWasEdited(firstName, lastName, departmentId);
+		
+		if (this.textIsEmpty(firstName)) {
+			const error_message = "First Name is empty!";
+			this.setState({
+				...this.state,
+				error_message
+			});
+			return;
+		}
+
+		if (this.textIsEmpty(lastName)) {
+			const error_message = "Last Name is empty!";
+			this.setState({
+				...this.state,
+				error_message
+			});
+			return;
+		}
+
+		if (departmentId === -1) {
+			const error_message = "Department is not chosen!";
+			this.setState({
+				...this.state,
+				error_message
+			});
+			return;
+		}		
+
+
+		if (this.props.store.selectedEmployeeId === -1) {
+			this.props.onEmployeeWasCreated(firstName, lastName, departmentId);
+		} else {
+			this.props.onEmployeeWasEdited(firstName, lastName, departmentId);
+		}
 	}
+
+	textIsEmpty(text) {
+        // check if text contains something instead of spaces, new lines and tabs
+        return !(/[^ \n\t]/.test(text));
+    }
 
 	onChangeHandler() {
 		this.setState({
@@ -82,9 +121,16 @@ class EmployeeEditor extends React.Component {
 				</button>
 			);
 		});
+		const error_message = this.state.error_message === null ?
+			"" : (
+				<div className="alert alert-danger" role="alert">
+					{this.state.error_message}
+				</div>
+			);
 		return (
 			<div className="content">
 				<h2>Employee editing</h2>
+				{error_message}
 				<form onChange={this.onChangeHandler.bind(this)}>
 					<div className="input-group">
 						<span
@@ -133,6 +179,10 @@ export default connect(
 	dispatch => ({
 		onEmployeeWasEdited: (firstName, lastName, departmentId) => dispatch({
 			type: "EMPLOYEE_WAS_EDITED",
+			firstName, lastName, departmentId
+		}),
+		onEmployeeWasCreated: (firstName, lastName, departmentId) => dispatch({
+			type: "NEW_EMPLOYEE",
 			firstName, lastName, departmentId
 		})    
 	})

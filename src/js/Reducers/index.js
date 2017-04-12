@@ -82,6 +82,47 @@ function reducer(state = initialState, action) {
             ...state,
             employees
         };
+    }  else if (action.type === "NEW_DEPARTMENT") {
+        const departments = state.departments;
+        const id = departments.length;
+        departments.push({
+            id,
+            name: action.value
+        });
+        const departmentJSON = JSON.stringify({
+            id: id.toString(),
+            name: departments[id].name
+        }); 
+        makeAjaxRequest(`departments/`, 'POST', departmentJSON)
+            .catch(error => console.log(error));
+        window.location.href = "/#/";
+        
+        return {
+            ...state,
+            departments
+        };
+    } else if (action.type === "NEW_EMPLOYEE") {
+        const employees = state.employees;
+        const id = employees.length;
+        employees.push({
+            id,
+            firstName: action.firstName,
+            lastName: action.lastName,
+            departmentId: action.departmentId
+        });
+        const employeeJSON = JSON.stringify({
+            id: id.toString(),
+            firstName: action.firstName,
+            lastName: action.lastName,
+            departmentId: action.departmentId.toString()
+        });
+        makeAjaxRequest(`employees/`, 'POST', employeeJSON)
+            .catch(error => console.log(error));
+        window.location.href = "/#/";
+        return {
+            ...state,
+            employees
+        };
     } else {
         return state;
     }

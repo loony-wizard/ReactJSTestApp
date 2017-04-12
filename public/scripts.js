@@ -23903,6 +23903,47 @@
 	        return (0, _extends3.default)({}, state, {
 	            employees: _employees
 	        });
+	    } else if (action.type === "NEW_DEPARTMENT") {
+	        var _departments2 = state.departments;
+	        var _id2 = _departments2.length;
+	        _departments2.push({
+	            id: _id2,
+	            name: action.value
+	        });
+	        var _departmentJSON2 = (0, _stringify2.default)({
+	            id: _id2.toString(),
+	            name: _departments2[_id2].name
+	        });
+	        (0, _ajax2.default)("departments/", 'POST', _departmentJSON2).catch(function (error) {
+	            return console.log(error);
+	        });
+	        window.location.href = "/#/";
+
+	        return (0, _extends3.default)({}, state, {
+	            departments: _departments2
+	        });
+	    } else if (action.type === "NEW_EMPLOYEE") {
+	        var _employees2 = state.employees;
+	        var _id3 = _employees2.length;
+	        _employees2.push({
+	            id: _id3,
+	            firstName: action.firstName,
+	            lastName: action.lastName,
+	            departmentId: action.departmentId
+	        });
+	        var employeeJSON = (0, _stringify2.default)({
+	            id: _id3.toString(),
+	            firstName: action.firstName,
+	            lastName: action.lastName,
+	            departmentId: action.departmentId.toString()
+	        });
+	        (0, _ajax2.default)("employees/", 'POST', employeeJSON).catch(function (error) {
+	            return console.log(error);
+	        });
+	        window.location.href = "/#/";
+	        return (0, _extends3.default)({}, state, {
+	            employees: _employees2
+	        });
 	    } else {
 	        return state;
 	    }
@@ -31617,6 +31658,8 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _reactRedux = __webpack_require__(199);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var ContentEmpty = function (_React$Component) {
@@ -31642,6 +31685,24 @@
 						"p",
 						null,
 						"Choose department or employee and start editing"
+					),
+					_react2.default.createElement(
+						"button",
+						{
+							onClick: this.props.onNewDepartmentButtonWasPressed,
+							type: "button",
+							className: "btn btn-secondary"
+						},
+						"Create new department"
+					),
+					_react2.default.createElement(
+						"button",
+						{
+							onClick: this.props.onNewEmployeeButtonWasPressed,
+							type: "button",
+							className: "btn btn-secondary"
+						},
+						"Create new employee"
 					)
 				);
 			}
@@ -31649,7 +31710,26 @@
 		return ContentEmpty;
 	}(_react2.default.Component);
 
-	exports.default = ContentEmpty;
+	exports.default = (0, _reactRedux.connect)(function (state) {
+		return {
+			store: state
+		};
+	}, function (dispatch) {
+		return {
+			onNewDepartmentButtonWasPressed: function onNewDepartmentButtonWasPressed() {
+				return dispatch({
+					type: "DEPARTMENT_WAS_CHOSEN",
+					departmentId: -1
+				});
+			},
+			onNewEmployeeButtonWasPressed: function onNewEmployeeButtonWasPressed() {
+				return dispatch({
+					type: "EMPLOYEE_WAS_CHOSEN",
+					employeeId: -1
+				});
+			}
+		};
+	})(ContentEmpty);
 
 /***/ },
 /* 385 */
@@ -31660,6 +31740,10 @@
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
+
+	var _extends2 = __webpack_require__(220);
+
+	var _extends3 = _interopRequireDefault(_extends2);
 
 	var _getPrototypeOf = __webpack_require__(346);
 
@@ -31698,7 +31782,8 @@
 			var _this = (0, _possibleConstructorReturn3.default)(this, (DepartmentEditor.__proto__ || (0, _getPrototypeOf2.default)(DepartmentEditor)).call(this, props));
 
 			_this.state = {
-				inputValue: _this.getDefaultInputValue()
+				inputValue: _this.getDefaultInputValue(),
+				error_message: null
 			};
 			return _this;
 		}
@@ -31707,14 +31792,27 @@
 			key: "save",
 			value: function save() {
 				var value = this.input.value;
-				this.props.onDepartmentWasEdited(value);
+
+				if (this.textIsEmpty(value)) {
+					var error_message = "Department name is empty!";
+					this.setState((0, _extends3.default)({}, this.state, {
+						error_message: error_message
+					}));
+					return;
+				}
+
+				if (this.props.store.selectedDepartmentId === -1) {
+					this.props.onDepartmentWasCreated(value);
+				} else {
+					this.props.onDepartmentWasEdited(value);
+				}
 			}
 		}, {
 			key: "onChangeHandler",
 			value: function onChangeHandler() {
-				this.setState({
+				this.setState((0, _extends3.default)({}, this.state, {
 					inputValue: this.input.value
-				});
+				}));
 			}
 		}, {
 			key: "getDefaultInputValue",
@@ -31730,12 +31828,18 @@
 				}
 			}
 		}, {
+			key: "textIsEmpty",
+			value: function textIsEmpty(text) {
+				// check if text contains something instead of spaces, new lines and tabs
+				return !/[^ \n\t]/.test(text);
+			}
+		}, {
 			key: "componentDidUpdate",
 			value: function componentDidUpdate(prevProps, prevState) {
 				if (this.props !== prevProps) {
-					this.setState({
+					this.setState((0, _extends3.default)({}, this.state, {
 						inputValue: this.getDefaultInputValue()
-					});
+					}));
 				}
 			}
 		}, {
@@ -31743,14 +31847,21 @@
 			value: function render() {
 				var _this2 = this;
 
+				var info = this.props.store.selectedDepartmentId === -1 ? "Creating new department" : "Department editing";
+				var error_message = this.state.error_message === null ? "" : _react2.default.createElement(
+					"div",
+					{ className: "alert alert-danger", role: "alert" },
+					this.state.error_message
+				);
 				return _react2.default.createElement(
 					"div",
 					{ className: "content" },
 					_react2.default.createElement(
 						"h2",
 						null,
-						"Department editing"
+						info
 					),
+					error_message,
 					_react2.default.createElement(
 						"div",
 						{ className: "input-group" },
@@ -31759,7 +31870,7 @@
 							{
 								className: "input-group-addon"
 							},
-							"Department Name"
+							info
 						),
 						_react2.default.createElement("input", {
 							type: "text",
@@ -31794,6 +31905,12 @@
 			onDepartmentWasEdited: function onDepartmentWasEdited(value) {
 				return dispatch({
 					type: "DEPARTMENT_WAS_EDITED",
+					value: value
+				});
+			},
+			onDepartmentWasCreated: function onDepartmentWasCreated(value) {
+				return dispatch({
+					type: "NEW_DEPARTMENT",
 					value: value
 				});
 			}
@@ -31858,7 +31975,8 @@
 			_this.state = {
 				firstNameInputValue: firstName,
 				lastNameInputValue: lastName,
-				departmentId: departmentId
+				departmentId: departmentId,
+				error_message: null
 			};
 			return _this;
 		}
@@ -31869,7 +31987,42 @@
 				var firstName = this.firstNameInput.value;
 				var lastName = this.lastNameInput.value;
 				var departmentId = this.state.departmentId;
-				this.props.onEmployeeWasEdited(firstName, lastName, departmentId);
+
+				if (this.textIsEmpty(firstName)) {
+					var error_message = "First Name is empty!";
+					this.setState((0, _extends3.default)({}, this.state, {
+						error_message: error_message
+					}));
+					return;
+				}
+
+				if (this.textIsEmpty(lastName)) {
+					var _error_message = "Last Name is empty!";
+					this.setState((0, _extends3.default)({}, this.state, {
+						error_message: _error_message
+					}));
+					return;
+				}
+
+				if (departmentId === -1) {
+					var _error_message2 = "Department is not chosen!";
+					this.setState((0, _extends3.default)({}, this.state, {
+						error_message: _error_message2
+					}));
+					return;
+				}
+
+				if (this.props.store.selectedEmployeeId === -1) {
+					this.props.onEmployeeWasCreated(firstName, lastName, departmentId);
+				} else {
+					this.props.onEmployeeWasEdited(firstName, lastName, departmentId);
+				}
+			}
+		}, {
+			key: "textIsEmpty",
+			value: function textIsEmpty(text) {
+				// check if text contains something instead of spaces, new lines and tabs
+				return !/[^ \n\t]/.test(text);
 			}
 		}, {
 			key: "onChangeHandler",
@@ -31942,6 +32095,11 @@
 						department.name
 					);
 				});
+				var error_message = this.state.error_message === null ? "" : _react2.default.createElement(
+					"div",
+					{ className: "alert alert-danger", role: "alert" },
+					this.state.error_message
+				);
 				return _react2.default.createElement(
 					"div",
 					{ className: "content" },
@@ -31950,6 +32108,7 @@
 						null,
 						"Employee editing"
 					),
+					error_message,
 					_react2.default.createElement(
 						"form",
 						{ onChange: this.onChangeHandler.bind(this) },
@@ -32030,6 +32189,12 @@
 			onEmployeeWasEdited: function onEmployeeWasEdited(firstName, lastName, departmentId) {
 				return dispatch({
 					type: "EMPLOYEE_WAS_EDITED",
+					firstName: firstName, lastName: lastName, departmentId: departmentId
+				});
+			},
+			onEmployeeWasCreated: function onEmployeeWasCreated(firstName, lastName, departmentId) {
+				return dispatch({
+					type: "NEW_EMPLOYEE",
 					firstName: firstName, lastName: lastName, departmentId: departmentId
 				});
 			}
